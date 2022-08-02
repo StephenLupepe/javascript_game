@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- importing fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 24px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- main container div -->
+    <div 
+      style ="
+      position: relative;
+      display: inline-block;">
+
+        <!-- ui container div -->
+        <div style ="
+        position: absolute;
+        display: flex; 
+        width: 100%; 
+        align-items: center;
+        padding: 10px;">
+
+            <!-- player health -->
+            <div style = "
+            position: relative;
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            border-top: solid 5px #e5e7eb;
+            border-left: solid 5px #e5e7eb;
+            border-bottom: solid 5px #e5e7eb;
+            border-radius: 5px 0px 0px 5px;">
+                <div 
+                style = "background-color: #b91c1c; height: 30px; width: 100%;"></div>
+                <div 
+                id = "playerHealth" 
+                style = "
+                position: absolute;
+                background-color: #fde047;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%"></div>
+            </div>
+            <!-- timer -->
+            <div id = "timer-box"
+            style = "
+            background-color: #9ca3af; 
+            height: 60px; 
+            width: 100px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: solid 5px #e5e7eb;
+            border-radius: 5px;">
+            <div id = "timer"
+            style = "
+            font-size: 40px;
+            font-family: 'Oswald', sans-serif;
+            background: -webkit-linear-gradient(#facc15, #b91c1c);
+            background-color: #dc2626;
+            -webkit-text-stroke: 1px #1f2937;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;"></div></div>
+            <!-- enemy health -->
+            <div style = "
+            position: relative; 
+            width: 100%;
+            border-top: solid 5px #e5e7eb;
+            border-right: solid 5px #e5e7eb;
+            border-bottom: solid 5px #e5e7eb;
+            border-radius: 0px 5px 5px 0px;">
+                <div 
+                style = "background-color: #b91c1c; height: 30px;"></div>
+                <div 
+                id = "enemyHealth" 
+                style = "
+                position: absolute;
+                background-color: #fde047;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;"></div>
+            </div>
+            <div></div>
+        </div>
+        <div id = "winLossDisplay"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        top: 0;
+        right: 0;
+        bottom: 0; 
+        left: 0;
+        display: none;"
+        ></div>
+        <canvas style = "width: 1024; height: 576;"></canvas>
+    </div>
+
+    <!-- import howler -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js" 
+    integrity="sha512-6+YN/9o9BWrk6wSfGxQGpt3EUK6XeHi6yeHV+TYD2GR0Sj/cggRpXr1BrAQf0as6XslxomMUxXp2vIl+fv0QRA==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer"></script>
+
+    <!-- import gsap animation library -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js" i
+    ntegrity="sha512-VEBjfxWUOyzl0bAwh4gdLEaQyDYPvLrZql3pw1ifgb6fhEvZl9iDDehwHZ+dsMzA0Jfww8Xt7COSZuJ/slxc4Q==" 
+    crossorigin="anonymous" 
+    referrerpolicy="no-referrer"></script>
+
+    <script src="js/character_data.js"></script>
+    <script src="js/music.js"></script>
+    <script src="js/classes.js"></script>
+    <script src="index.js"></script>
+</body>
+</html>
