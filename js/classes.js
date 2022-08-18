@@ -212,7 +212,7 @@ class Fighter extends Sprite{
 
     animateAttacks() {
 
-        if (this.frameCurrent < this.animationDelays.length){
+        if (this.frameCurrent < this.animationDelays[this.frameCurrent]){
             setTimeout(()=>{
                 console.log("current frame delay " + this.animationDelays[this.frameCurrent])
                 this.frameCurrent++

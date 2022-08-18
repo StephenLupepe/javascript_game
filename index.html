@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color: darkblue;">
 <head>
     <!-- importing fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,9 +23,10 @@
       display: inline-block;">
 
         <!-- ui container div -->
-        <div style ="
+        <div id = "healthbars" 
+        style ="
         position: absolute;
-        display: flex; 
+        display: none; 
         width: 100%; 
         align-items: center;
         padding: 10px;">
@@ -108,7 +109,168 @@
         left: 0;
         display: none;"
         ></div>
+        <button id = "clickstart"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        right: 0;
+        bottom: 30%; 
+        left: 25%;
+        display: flex;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        width: 500px;"
+        >Click to Begin</button>
+        <button id = "1p2p"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        right: 0;
+        bottom: 35%; 
+        left: 25%;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        width: 500px;"
+        >1P vs 2P</button>
+        <button id = "1pcom"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        right: 0;
+        bottom: 25%; 
+        left: 25%;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        width: 500px;"
+        >1P vs COM</button>
+        <button id = "com2p"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        right: 0;
+        bottom: 15%; 
+        left: 25%;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        width: 500px;"
+        >COM vs 2P</button>
+        <div id = "charselecttitle"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        right: 0;
+        bottom: 90%; 
+        left: 25%;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        width: 500px;"
+        >Choose your fighter!</div>
+        <button id = "knightselect1"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        top: 100px;
+        left: 264px;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        height: 128px;
+        width: 128px;"
+        ></button>
+        <button id = "ninjaselect1"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        top: 100px;
+        left: 634px;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        height: 128px;
+        width: 128px;"
+        ></button>
+        <button id = "priestessselect1"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        top: 300px;
+        left: 264px;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        height: 128px;
+        width: 128px;"
+        ></button>
+        <button id = "randomselect1"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        top: 300px;
+        left: 634px;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        height: 128px;
+        width: 128px;"
+        ></button>
+        <button id = "startbattle"
+        style = "position: absolute; 
+        color: #f4f4f5;
+        text-shadow: black 1px 1px;
+        align-items: center; 
+        justify-content: center;
+        right: 0;
+        bottom: 5%; 
+        left: 25%;
+        display: none;
+        background-color: transparent;
+        border: none;
+        outline: none;
+        cursor: pointer;
+        width: 500px;"
+        >Click to Begin Battle</button>
         <canvas style = "width: 1024; height: 576;"></canvas>
+       
     </div>
 
     <!-- import howler -->

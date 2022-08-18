@@ -4,12 +4,12 @@
 //add a different animation method for attacks, throws, and special attacks that animates frame by frame with given delays
 //add a slowdown on final attack/ death animation for extra pazzaz
 //adjust special attack to have a pause/flash and show the chracter glowing when available
+//add round end card and play again options
 //add title screen and character select
 //add (update) additional characters
 //add 3 round system and round call voice/ messages
 //add cpu opponent
 //add multiple stages and scrolling background
-
 
 //declaring game data
 const canvas = document.querySelector('canvas');
@@ -24,7 +24,8 @@ const namePlayer1 = "player"
 const namePlayer2 = "enemy"
 const specialAttackThreshold = 0.8;
 const characterStartOffset = 200;
-
+let title_stage = 1
+let selecting_player = 1
 //initializing the keys that will be used to control the characters
 
 const keys = {
@@ -69,6 +70,9 @@ const keys = {
     },
     right: {
         pressed: false
+    },
+    space: {
+        pressed: false
     }
 }
 
@@ -77,9 +81,72 @@ const keys = {
 c.fillRect(0, 0, canvas.width, canvas.height);
 
 //setting up the game
+//setting up the title screen
+
+const title_screen = new Sprite({
+    position: {
+        x: 0,
+        y: 0
+    },
+    imageSrc: './img/title_screen.png'
+})
+
+const title_text = new Sprite({
+    position: {
+        x: 200,
+        y: 100
+    },
+    scale: 1.4,
+    imageSrc: './img/knight_fighter_title.png'
+})
+
+//drawing the character select screen 
+
+const char_select = new Sprite({
+    position: {
+        x: 0,
+        y: 0
+    },
+    imageSrc: './img/background_wall.png'
+})
+
+const knight_select = new Sprite({
+    position: {
+        x: 262,
+        y: 100
+    },
+    scale: 2,
+    imageSrc: './img/fire_knight.png'
+})
+
+const ninja_select = new Sprite({
+    position: {
+        x: 632,
+        y: 100
+    },
+    scale: 2,
+    imageSrc: './img/metal_bladekeeper.png'
+})
+
+const priestess_select = new Sprite({
+    position: {
+        x: 262,
+        y: 300
+    },
+    scale: 2,
+    imageSrc: './img/water_priestess.png'
+})
+
+const random_select = new Sprite({
+    position: {
+        x: 632,
+        y: 300
+    },
+    scale: 2,
+    imageSrc: './img/random.png'
+})
 
 //drawing the background 
-
 const background = new Sprite({
     position: {
         x: 0,
@@ -100,8 +167,8 @@ const shop = new Sprite({
 
 //deciding the characters for both players
 
-const playerCharacter = knight;
-const enemyCharacter = knight;
+let playerCharacter = knight;
+let enemyCharacter = knight;
 
 
 //determining the start location for both characters
@@ -171,9 +238,33 @@ function collisionDetection({player, enemy}) {
      }
  }
 
-//drawing and animating the canvas
-function animate() {
-    window.requestAnimationFrame(animate);
+
+//drawing and animating the title screen
+
+let titleId
+function animate_title() {
+    const titleId = window.requestAnimationFrame(animate_title)
+    c.fillStyle = "black"
+    c.fillRect(0, 0, canvas.width, canvas.height);
+    title_screen.update()
+    title_text.update()
+}
+
+let charSelectId
+function animate_charSelect() {
+    const charSelectId = window.requestAnimationFrame(animate_charSelect)
+    c.fillStyle = "black"
+    c.fillRect(0, 0, canvas.width, canvas.height);
+    char_select.update()
+    knight_select.update()
+    ninja_select.update()
+    priestess_select.update()
+    random_select.update()
+}
+
+//drawing and animating the battle screen
+function animate_battle() {
+    const battleId = window.requestAnimationFrame(animate_battle);
     c.fillStyle = "black"
     c.fillRect(0, 0, canvas.width, canvas.height);
     background.update()
@@ -186,7 +277,6 @@ function animate() {
 
     //player 1 movement
     if((player.canMove) && (!player.isHit)) {
-
 
         //Ground Movement:
         //if a is pressed, move left
@@ -330,14 +420,63 @@ function decreaseTimer() {
         }
 }
 
-decreaseTimer()
+//Setup ends here. Game starts from below:
 
-animate()
+animate_title()
+
+document.querySelectorAll('button').forEach(button =>
+    {
+        button.addEventListener('click', () => {
+            if (button.id == '1p2p') {
+            window.cancelAnimationFrame(titleId)
+            document.getElementById("1p2p").style.display = "none";
+            document.getElementById("1pcom").style.display = "none";
+            document.getElementById("com2p").style.display = "none";
+            document.getElementById("startbattle").style.display = "flex";
+            document.getElementById("charselecttitle").style.display = "flex";
+            document.getElementById("knightselect1").style.display = "flex";
+            document.getElementById("ninjaselect1").style.display = "flex";
+            document.getElementById("priestessselect1").style.display = "flex";
+            document.getElementById("randomselect1").style.display = "flex";
+
+            music.title.stop()
+            animate_charSelect()
+            music.character_select.play()
+        }
+        if (button.id == 'startbattle') {
+            window.cancelAnimationFrame(charSelectId)
+            document.getElementById("startbattle").style.display = "none";
+            document.getElementById("charselecttitle").style.display = "none";
+            document.getElementById("knightselect1").style.display = "none";
+            document.getElementById("ninjaselect1").style.display = "none";
+            document.getElementById("priestessselect1").style.display = "none";
+            document.getElementById("randomselect1").style.display = "none";
+            document.getElementById("healthbars").style.display = "flex";
+            music.character_select.stop()
+            animate_battle()
+            decreaseTimer()
+            music.battle.play()
+        }
+    })
+    })
+
+let clicked = false
+addEventListener('click', (event) =>{
+    if (!clicked){
+        music.title.play()
+        document.getElementById("clickstart").style.display = "none";
+        document.getElementById("1p2p").style.display = "flex";
+        document.getElementById("1pcom").style.display = "flex";
+        document.getElementById("com2p").style.display = "flex";
+        clicked = true
+    }
+})
 
 window.addEventListener("keydown", (event) => {
     switch (event.key) {
         case 'w':
         keys.w.pressed = true;
+        console.log(title_stage)
         break
         case 'a':
         keys.a.pressed = true;
@@ -405,7 +544,10 @@ window.addEventListener("keydown", (event) => {
                 enemy.hasSpecial = false
                 enemy.attackDeclare(enemy, enemy.attacks.special)}
         break
-        
+        case ' ':
+        keys.space.pressed = true;
+        console.log(event)
+        break
     }
 
 })
@@ -458,18 +600,11 @@ window.addEventListener("keyup", (event) => {
                 case 'ArrowRight':
                 keys.right.pressed = false;
                 break
+                case 'LeftClick':
+                keys.left_click.pressed = false;
+                break
+                case ' ':
+                keys.space.pressed = false;
+                break
             }
-
-        
-
-})
-
-let clicked = false
-
-addEventListener("click", (event) =>{
-    if (!clicked){
-        music.battle.play()
-        clicked = true
-    }
-
 })
