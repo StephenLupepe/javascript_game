@@ -1,15 +1,14 @@
 //To do:
-//FIX: change back death animation method and fix sprites looping on death (only for win/loss after timeout)
 //FIX: unable to turn off standard animation method (and hence use attack animation method) for the second part of a throw
-//add a different animation method for attacks, throws, and special attacks that animates frame by frame with given delays
-//add a slowdown on final attack/ death animation for extra pazzaz
-//adjust special attack to have a pause/flash and show the chracter glowing when available
-//add round end card and play again options
-//add title screen and character select
-//add (update) additional characters
-//add 3 round system and round call voice/ messages
+
+//add 3 round system and set win messages
+//adjust special attack to show the chracter glowing when available
+//make priestesses standard attack into a projectile
+//add command guides
+
+//Extras: 
+//add more music tracks, stages and characters
 //add cpu opponent
-//add multiple stages and scrolling background
 
 //declaring game data
 const canvas = document.querySelector('canvas');
@@ -19,13 +18,20 @@ canvas.height = 576;
 const groundHeight = 115;
 const gravity = 0.5;
 const gameTime = 30;
-const drawHitboxesOn = false;
+const drawHitboxesOn = true;
 const namePlayer1 = "player"
 const namePlayer2 = "enemy"
 const specialAttackThreshold = 0.8;
 const characterStartOffset = 200;
-let title_stage = 1
+const defaultCharacterWidth = 80;
+const defaultYLoc = 391;
 let selecting_player = 1
+let startingBattle = true
+let roundOver = false
+let roundCount = 1
+let playerRounds = 0
+let enemyRounds = 0
+
 //initializing the keys that will be used to control the characters
 
 const keys = {
@@ -107,6 +113,16 @@ const char_select = new Sprite({
         x: 0,
         y: 0
     },
+    scale: 3,
+    imageSrc: './img/background_wall.png'
+})
+
+const char_select2 = new Sprite({
+    position: {
+        x: 0,
+        y: -canvas.height
+    },
+    scale: 3,
     imageSrc: './img/background_wall.png'
 })
 
@@ -165,25 +181,23 @@ const shop = new Sprite({
     framesTotal: 6
 })
 
-//deciding the characters for both players
+//determing the default character and settings for both players
 
-let playerCharacter = knight;
-let enemyCharacter = knight;
+let playerCharacter = knight   
+let enemyCharacter = ninja
 
-
-//determining the start location for both characters
-
+//determining the default start location for both characters
 const playerStart = {
-    x: characterStartOffset - playerCharacter.data.width,
-    y: 0
+    x: characterStartOffset - defaultCharacterWidth,
+    y: defaultYLoc 
 }
 const enemyStart = {
     x: canvas.width - characterStartOffset,
-    y: 0
+    y: defaultYLoc
 }
 
-//creating two instances of the fighter for the two players
-const player = new Fighter({
+//creating two default instances of the fighter for the two players
+let player = new Fighter({
     name: namePlayer1,
     position: playerStart,
     character : playerCharacter,
@@ -195,7 +209,7 @@ const player = new Fighter({
     audio: playerCharacter.audio
 })
 
-const enemy = new Fighter({
+let enemy = new Fighter({
     name: namePlayer2,
     position: enemyStart,
     character: enemyCharacter,
@@ -238,7 +252,6 @@ function collisionDetection({player, enemy}) {
      }
  }
 
-
 //drawing and animating the title screen
 
 let titleId
@@ -255,11 +268,198 @@ function animate_charSelect() {
     const charSelectId = window.requestAnimationFrame(animate_charSelect)
     c.fillStyle = "black"
     c.fillRect(0, 0, canvas.width, canvas.height);
+    char_select.position.y += 1
+    if (char_select.position.y >= canvas.height){
+        char_select.position.y = -canvas.height
+    }
+    char_select2.position.y += 1
+    if (char_select2.position.y >= canvas.height){
+        char_select2.position.y = -canvas.height
+    }
     char_select.update()
+    char_select2.update()
     knight_select.update()
     ninja_select.update()
     priestess_select.update()
     random_select.update()
+}
+
+function select_screen_reset() {
+    document.getElementById("knightselect1").style.border = "none";
+    document.getElementById("ninjaselect1").style.border = "none";
+    document.getElementById("priestessselect1").style.border = "none";
+    document.getElementById("randomselect1").style.border = "none";
+    document.getElementById("p1knight").style.display = "none";
+    document.getElementById("p1ninja").style.display = "none";
+    document.getElementById("p1priestess").style.display = "none";
+    document.getElementById("p1random").style.display = "none";
+    document.getElementById("p2knight").style.display = "none";
+    document.getElementById("p2ninja").style.display = "none";
+    document.getElementById("p2priestess").style.display = "none";
+    document.getElementById("p2random").style.display = "none";
+}
+
+function select_character() {
+    if (playerCharacter == knight){
+        document.getElementById("knightselect1").style.border = "yellow solid 5px";
+        document.getElementById("p1knight").style.display = "flex";
+        player = new Fighter({
+            name: namePlayer1,
+            position: playerStart,
+            character : playerCharacter,
+            imageSrc: playerCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: playerCharacter.sprites.idle.framesTotal,
+            offset: playerCharacter.data.hitboxOffset,
+            sprites: playerCharacter.sprites,
+            audio: playerCharacter.audio
+        })      
+        
+    } else if (playerCharacter == ninja){
+        document.getElementById("ninjaselect1").style.border = "yellow solid 5px";
+        document.getElementById("p1ninja").style.display = "flex";
+        player = new Fighter({
+            name: namePlayer1,
+            position: playerStart,
+            character : playerCharacter,
+            imageSrc: playerCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: playerCharacter.sprites.idle.framesTotal,
+            offset: playerCharacter.data.hitboxOffset,
+            sprites: playerCharacter.sprites,
+            audio: playerCharacter.audio
+        })      
+    } else if (playerCharacter == priestess){
+        document.getElementById("priestessselect1").style.border = "yellow solid 5px";
+        document.getElementById("p1priestess").style.display = "flex";
+        player = new Fighter({
+            name: namePlayer1,
+            position: playerStart,
+            character : playerCharacter,
+            imageSrc: playerCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: playerCharacter.sprites.idle.framesTotal,
+            offset: playerCharacter.data.hitboxOffset,
+            sprites: playerCharacter.sprites,
+            audio: playerCharacter.audio
+        })
+
+    } 
+    if (enemyCharacter == knight){
+        document.getElementById("knightselect1").style.border = "blue solid 5px";
+        document.getElementById("p2knight").style.display = "flex";
+        enemy = new Fighter({
+            name: namePlayer2,
+            position: enemyStart,
+            character: enemyCharacter,
+            imageSrc: enemyCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: enemyCharacter.sprites.idle.framesTotal,
+            offset: {
+                x: 320,
+                y: 200
+            },
+            sprites: enemyCharacter.sprites,
+            audio: enemyCharacter.audio
+        })
+    } else if (enemyCharacter == ninja){
+        document.getElementById("ninjaselect1").style.border = "blue solid 5px";
+        document.getElementById("p2ninja").style.display = "flex";
+        enemy = new Fighter({
+            name: namePlayer2,
+            position: enemyStart,
+            character: enemyCharacter,
+            imageSrc: enemyCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: enemyCharacter.sprites.idle.framesTotal,
+            offset: {
+                x: 320,
+                y: 200
+            },
+            sprites: enemyCharacter.sprites,
+            audio: enemyCharacter.audio
+        })  
+    } else if (enemyCharacter == priestess){
+        document.getElementById("priestessselect1").style.border = "blue solid 5px";
+        document.getElementById("p2priestess").style.display = "flex";
+        enemy = new Fighter({
+            name: namePlayer2,
+            position: enemyStart,
+            character: enemyCharacter,
+            imageSrc: enemyCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: enemyCharacter.sprites.idle.framesTotal,
+            offset: {
+                x: 320,
+                y: 200
+            },
+            sprites: enemyCharacter.sprites,
+            audio: enemyCharacter.audio
+        })
+    } 
+    if (selecting_player == 1){
+        selecting_player = 2
+        document.getElementById("p1border").style.display = "none";
+        document.getElementById("p2border").style.display = "flex";
+    } else if (selecting_player == 2) {
+        selecting_player = 3
+        document.getElementById("p2border").style.display = "none";
+        document.getElementById("startbattle").style.color = "yellow";
+    }
+}
+
+function battleStart(){
+    if (startingBattle == true){
+        roundOver = false
+
+        player = new Fighter({
+            name: namePlayer1,
+            position: playerStart,
+            character : playerCharacter,
+            imageSrc: playerCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: playerCharacter.sprites.idle.framesTotal,
+            offset: playerCharacter.data.hitboxOffset,
+            sprites: playerCharacter.sprites,
+            audio: playerCharacter.audio
+        })
+        player.position.x = characterStartOffset - defaultCharacterWidth
+        
+        enemy = new Fighter({
+            name: namePlayer2,
+            position: enemyStart,
+            character: enemyCharacter,
+            imageSrc: enemyCharacter.sprites.idle.imageSrc,
+            scale: 2.5,
+            framesTotal: enemyCharacter.sprites.idle.framesTotal,
+            offset: {
+                x: 320,
+                y: 200
+            },
+            sprites: enemyCharacter.sprites,
+            audio: enemyCharacter.audio
+        })
+        enemy.position.x = canvas.width - characterStartOffset
+
+        startingBattle = false
+        
+        player.canMove = false
+        enemy.canMove = false
+        document.querySelector('#centerText').style.display = 'flex'
+        document.querySelector('#centerText').innerHTML = 'Ready?'
+
+        setTimeout(()=>{
+            document.querySelector('#centerText').innerHTML = 'Fight!'
+            player.canMove = true
+            enemy.canMove = true
+            //sets gamer timer and determines winner at timeout
+            timer = gameTime;
+            decreaseTimer()
+            setTimeout(() => {
+            document.querySelector('#centerText').style.display = 'none'
+            }, 500);
+        }, 1000)
+    }
 }
 
 //drawing and animating the battle screen
@@ -271,9 +471,9 @@ function animate_battle() {
     shop.update()
     c.fillStyle = 'rgba(255, 255, 255, 0.15)'
     c.fillRect(0, 0, canvas.width, canvas.height)
+    battleStart();
     player.update();
     enemy.update();
-
 
     //player 1 movement
     if((player.canMove) && (!player.isHit)) {
@@ -361,14 +561,13 @@ function animate_battle() {
                 enemy.switchSprite('jump')
                 enemy.velocity.y = -(enemyCharacter.data.jumpSpeed);
             }
-    } else if (enemy.velocity.y >=0 ){
+    } else if (enemy.velocity.y >=0){
         enemy.switchSprite('fall')
     }
 
     } else if ((!enemy.canMove) && (!enemy.isHit)) {                  //locks player in place during attacks (but not hits!)
         enemy.velocity.x = 0;
     }
-
 
     if (player.currentHealth <= 0 || enemy.currentHealth <= 0) {
         determineWinner({player, enemy, timerId})
@@ -377,36 +576,88 @@ function animate_battle() {
 
 //is called upon 0 health or timeout to determine the winner of the game
 function determineWinner({player, enemy, timerId}) {
-    clearTimeout(timerId)
-    document.querySelector("#winLossDisplay").style.display = 'flex'
-    player.velocity.x = 0
-    player.canMove = false
-    player.gameOver = true
-    enemy.velocity.x = 0
-    enemy.canMove = false
-    enemy.gameOver = true
+    if (roundOver == false){
+        roundOver = true
+        clearTimeout(timerId)
+        document.querySelector("#centerText").style.display = 'flex'
+        player.velocity.x = 0
+        player.canMove = false
+        player.gameOver = true
+        enemy.velocity.x = 0
+        enemy.canMove = false
+        enemy.gameOver = true
 
-    if (player.currentHealth < enemy.currentHealth){
-        document.querySelector("#winLossDisplay").innerHTML = 'Player 2 Wins!'
-        player.switchSprite('death')
-        setTimeout(()=>{enemy.switchSprite('victory')}, 2500)
-    } else if (enemy.currentHealth < player.currentHealth){
-        document.querySelector("#winLossDisplay").innerHTML = 'Player 1 Wins!'
-        enemy.switchSprite('death')
-        enemy.animateAttacks()
+        if (player.currentHealth < enemy.currentHealth){
+            document.querySelector("#centerText").innerHTML = 'Player 2 Wins!'
+            enemyRounds += 1
+            player.switchSprite('death')
+            setTimeout(()=>{enemy.switchSprite('victory')}, 2000)
+        } else if (enemy.currentHealth < player.currentHealth){
+            document.querySelector("#centerText").innerHTML = 'Player 1 Wins!'
+            playerRounds += 1
+            enemy.switchSprite('death')
+            setTimeout(()=>{player.switchSprite('victory')}, 2000)
+        } else if (player.currentHealth === enemy.currentHealth) {
+            document.querySelector("#centerText").innerHTML = 'Draw'
+            player.switchSprite('idle')
+            enemy.switchSprite('idle')
+        }
+        if (playerRounds == 2 || enemyRounds == 2){
+            if (playerRounds == 2){
+                document.querySelector("#p1win2").style.display = 'none';
+                document.querySelector("#p1win2winner").style.display = 'flex';
+            } else if (enemyRounds == 2){
+                document.querySelector("#p2win2").style.display = 'none';
+                document.querySelector("#p2win2winner").style.display = 'flex';
+            }
+
+
+            setTimeout(()=>{
+                music.battle.stop()
+                music.victory.play()
+            }, 8000)
+        } else if (playerRounds == 1){
+            document.querySelector("#p1win1").style.display = 'none';
+            document.querySelector("#p1win1winner").style.display = 'flex';
+        } else if (enemyRounds == 1){
+            document.querySelector("#p2win1").style.display = 'none';
+            document.querySelector("#p2win1winner").style.display = 'flex';
+        }
+
         setTimeout(()=>{
-            player.switchSprite('victory')
-            player.animateAttacks()}, 2500)
-    } else if (player.currentHealth === enemy.currentHealth) {
-        document.querySelector("#winLossDisplay").innerHTML = 'Draw'
-        player.switchSprite('idle')
-        enemy.switchSprite('idle')
+            if (playerRounds < 2 && enemyRounds < 2){
+                console.log("next round")
+                    startingBattle = true
+            
+            } else if (playerRounds == 2){
+                document.querySelector('#winscreenoverlay').style.display = 'flex'
+                if (playerCharacter == knight){
+                    document.querySelector('#knightwinquote').style.display = 'flex'
+                    document.querySelector('#knightwinpic').style.display = 'flex'
+                } else if (playerCharacter == ninja){
+                    document.querySelector('#ninjawinquote').style.display = 'flex'
+                    document.querySelector('#ninjawinpic').style.display = 'flex'
+                } else if (playerCharacter == priestess){
+                    document.querySelector('#priestesswinquote').style.display = 'flex'
+                    document.querySelector('#priestesswinpic').style.display = 'flex'
+                }
+
+            } else if (enemyRounds == 2){
+                document.querySelector('#winscreenoverlay').style.display = 'flex'
+                if (enemyCharacter == knight){
+                    document.querySelector('#knightwinquote').style.display = 'flex'
+                    document.querySelector('#knightwinpic').style.display = 'flex'
+                } else if (enemyCharacter == ninja){
+                    document.querySelector('#ninjawinquote').style.display = 'flex'
+                    document.querySelector('#ninjawinpic').style.display = 'flex'
+                } else if (enemyCharacter == priestess){
+                    document.querySelector('#priestesswinquote').style.display = 'flex'
+                    document.querySelector('#priestesswinpic').style.display = 'flex'
+                }
+            }  
+        }, 13000)      
     }
 }
-
-//sets gamer timer and determines winner at timeout
-let timer = gameTime;
-let timerId;
 
 function decreaseTimer() {
     if (timer > 0){
@@ -422,6 +673,10 @@ function decreaseTimer() {
 
 //Setup ends here. Game starts from below:
 
+//sets gamer timer and determines winner at timeout
+let timer = gameTime;
+let timerId;
+
 animate_title()
 
 document.querySelectorAll('button').forEach(button =>
@@ -433,29 +688,117 @@ document.querySelectorAll('button').forEach(button =>
             document.getElementById("1pcom").style.display = "none";
             document.getElementById("com2p").style.display = "none";
             document.getElementById("startbattle").style.display = "flex";
+            document.getElementById("changecharacters").style.display = "flex";
             document.getElementById("charselecttitle").style.display = "flex";
+            document.getElementById("p1title").style.display = "flex";
+            document.getElementById("p2title").style.display = "flex";
             document.getElementById("knightselect1").style.display = "flex";
             document.getElementById("ninjaselect1").style.display = "flex";
             document.getElementById("priestessselect1").style.display = "flex";
             document.getElementById("randomselect1").style.display = "flex";
+            document.getElementById("p1border").style.display = "flex";
+            document.getElementById("p1knight").style.display = "flex";
+            document.getElementById("p2ninja").style.display = "flex";
+
 
             music.title.stop()
             animate_charSelect()
             music.character_select.play()
         }
+
+        if (button.id == 'knightselect1') {
+            select_screen_reset()
+            if (selecting_player == 1){
+                playerCharacter = knight
+            } else if (selecting_player == 2){
+                enemyCharacter = knight
+            }            
+            select_character()
+        }
+
+        if (button.id == 'ninjaselect1') {
+            select_screen_reset()
+            if (selecting_player == 1){
+                playerCharacter = ninja
+            } else if (selecting_player == 2){
+                enemyCharacter = ninja
+            }            
+            select_character()
+        }
+
+        if (button.id == 'priestessselect1') {
+            select_screen_reset()
+            if (selecting_player == 1){
+                playerCharacter = priestess
+            } else if (selecting_player == 2){
+                enemyCharacter = priestess
+            }
+            select_character()
+        }
+
+        if (button.id == 'randomselect1') {
+            random_character = Math.floor((Math.random() * 3))
+            select_screen_reset()
+            if (selecting_player == 1){
+                if (random_character == 0){
+                    playerCharacter = knight
+                } else if (random_character == 1){
+                    playerCharacter = ninja
+                } else if (random_character == 2){
+                    playerCharacter = priestess
+                }
+            } else if (selecting_player == 2){
+                if (random_character == 0){
+                    enemyCharacter = knight
+                } else if (random_character == 1){
+                    enemyCharacter = ninja
+                } else if (random_character == 2){
+                    enemyCharacter = priestess
+                }
+            }
+            select_character()
+        }
+
+        if (button.id == 'changecharacters') {
+            select_screen_reset()
+            selecting_player = 1
+            document.getElementById("p1border").style.display = "flex";
+            document.getElementById("p1knight").style.display = "flex";
+            document.getElementById("p2ninja").style.display = "flex";
+        }
+
         if (button.id == 'startbattle') {
-            window.cancelAnimationFrame(charSelectId)
-            document.getElementById("startbattle").style.display = "none";
-            document.getElementById("charselecttitle").style.display = "none";
-            document.getElementById("knightselect1").style.display = "none";
-            document.getElementById("ninjaselect1").style.display = "none";
-            document.getElementById("priestessselect1").style.display = "none";
-            document.getElementById("randomselect1").style.display = "none";
-            document.getElementById("healthbars").style.display = "flex";
-            music.character_select.stop()
-            animate_battle()
-            decreaseTimer()
-            music.battle.play()
+            if (selecting_player == 3){
+                window.cancelAnimationFrame(charSelectId)
+                document.getElementById("startbattle").style.display = "none";
+                document.getElementById("charselecttitle").style.display = "none";
+                document.getElementById("changecharacters").style.display = "none";
+                document.getElementById("p1title").style.display = "none";
+                document.getElementById("p1knight").style.display = "none";
+                document.getElementById("p1ninja").style.display = "none";
+                document.getElementById("p1priestess").style.display = "none";
+                document.getElementById("p1random").style.display = "none";
+                document.getElementById("knightselect1").style.display = "none";
+                document.getElementById("ninjaselect1").style.display = "none";
+                document.getElementById("priestessselect1").style.display = "none";
+                document.getElementById("randomselect1").style.display = "none";
+                document.getElementById("p2title").style.display = "none";
+                document.getElementById("p2knight").style.display = "none";
+                document.getElementById("p2ninja").style.display = "none";
+                document.getElementById("p2priestess").style.display = "none";
+                document.getElementById("p2random").style.display = "none";
+                document.getElementById("healthbars").style.display = "flex";
+                document.getElementById("p1win1").style.display = "flex";
+                document.getElementById("p1win2").style.display = "flex";
+                document.getElementById("p2win1").style.display = "flex";
+                document.getElementById("p2win2").style.display = "flex";
+                document.getElementById("p1buttons").style.display = "flex";
+                document.getElementById("p2buttons").style.display = "flex";
+    
+                music.character_select.stop()
+                animate_battle()
+                music.battle.play()
+            }
         }
     })
     })
@@ -476,7 +819,6 @@ window.addEventListener("keydown", (event) => {
     switch (event.key) {
         case 'w':
         keys.w.pressed = true;
-        console.log(title_stage)
         break
         case 'a':
         keys.a.pressed = true;
@@ -546,7 +888,6 @@ window.addEventListener("keydown", (event) => {
         break
         case ' ':
         keys.space.pressed = true;
-        console.log(event)
         break
     }
 

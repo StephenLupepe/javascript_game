@@ -36,7 +36,6 @@ class Sprite {
                     this.frameCurrent = 0
                 }
             }
-
     }
 
     update() {
@@ -197,7 +196,6 @@ class Fighter extends Sprite{
 
     animateFrames() {
         this.framesElapsed++
-        console.log('standard animate')
 
         if (!this.isAttackSprite){
             if (this.framesElapsed % this.framesHold === 0) {
@@ -214,7 +212,6 @@ class Fighter extends Sprite{
 
         if (this.frameCurrent < this.animationDelays[this.frameCurrent]){
             setTimeout(()=>{
-                console.log("current frame delay " + this.animationDelays[this.frameCurrent])
                 this.frameCurrent++
                 this.animateAttacks()
             }, this.animationDelays[this.frameCurrent])
@@ -261,7 +258,7 @@ class Fighter extends Sprite{
         } else {
             this.velocity.y += gravity;
         }
-
+        
         //updates whether the fighter is on the left or right side
         if (this.name === namePlayer1){
             if (player.position.x <= enemy.position.x){
@@ -304,13 +301,20 @@ class Fighter extends Sprite{
         //draws the new state to the canvas now that the properties have been updated
         this.draw()
         this.drawHealthbars()
-        
+
+        if ((this.currentSprite == this.sprites.death.name) || (this.currentSprite == this.sprites.victory.name)){
+            if (this.frameCurrent == this.framesTotal - 1){
+                this.stopAnimating = true
+            }
+        }
+
+        //forces animation to stop under certain conditions
         if (!this.stopAnimating){
             if (!this.isAttackSprite){
                 this.animateFrames()
             } 
         }
-
+        //draws hitboxes for debugging purposes
         if(drawHitboxesOn){
             this.drawHitboxes()
         }
@@ -372,9 +376,11 @@ class Fighter extends Sprite{
                             defender.velocity.x = attacker.currentAttack.hitPushBack
                         }
                         setTimeout(()=> {
-                            defender.canMove = true
-                            defender.velocity.x = 0
-                            defender.isHit = false
+                            if (!defender.gameOver){
+                                defender.canMove = true
+                                defender.velocity.x = 0
+                                defender.isHit = false
+                            }
                         }, attacker.currentAttack.hitStun) 
                     }
                     
@@ -431,13 +437,6 @@ class Fighter extends Sprite{
     }
 
     switchSprite(sprite){
-        if (this.image === this.sprites.death.image || this.image === this.sprites.victory.image) {
-            if((this.image === this.sprites.death.image && this.frameCurrent === this.sprites.death.framesTotal - 1) ||
-                (this.image === this.sprites.victory.image && this.frameCurrent === this.sprites.victory.framesTotal - 1)){
-                this.stopAnimating = true
-            }
-            return}
-            
         switch (sprite){
             case 'idle':
                 if(this.image != this.sprites.idle.image){
@@ -492,7 +491,6 @@ class Fighter extends Sprite{
                     this.isAttackSprite = this.sprites.attack.attackSprite
                     this.frameCurrent = 0
                     this.animationDelays = this.sprites.attack.animationDelays
-                    console.log(this.animationDelays)
                 }
             break
             case 'throw_start':
@@ -503,7 +501,6 @@ class Fighter extends Sprite{
                     this.isAttackSprite = this.sprites.throw_start.attackSprite
                     this.frameCurrent = 0
                     this.animationDelays = this.sprites.throw_start.animationDelays
-                    console.log(this.animationDelays)
                 }
             break
             case 'throw':
@@ -514,7 +511,6 @@ class Fighter extends Sprite{
                     this.isAttackSprite = this.sprites.throw.attackSprite
                     this.frameCurrent = 0
                     this.animationDelays = this.sprites.throw.animationDelays
-                    console.log(this.animationDelays)
                 }
             break
             case 'takeHit':
@@ -542,6 +538,7 @@ class Fighter extends Sprite{
                     this.framesTotal = this.sprites.death.framesTotal
                     this.isAttackSprite = this.sprites.death.attackSprite
                     this.frameCurrent = 0
+                    console.log("death")
                 }
             break
             case 'victory':
@@ -551,6 +548,7 @@ class Fighter extends Sprite{
                     this.framesTotal = this.sprites.victory.framesTotal
                     this.isAttackSprite = this.sprites.victory.attackSprite
                     this.frameCurrent = 0
+                    console.log('victory')
                 }
             break
             }

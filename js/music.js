@@ -16,6 +16,12 @@ const music = {
         loop: true,
         volume: 0.1,
         html5: true
+    }),
+    victory: new Howl({
+        src: './audio/Roll Me In Stardust.mp3',
+        loop: true,
+        volume: 0.1,
+        html5: true
     })
     
     }
